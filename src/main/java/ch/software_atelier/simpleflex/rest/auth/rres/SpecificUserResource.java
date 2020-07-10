@@ -28,8 +28,6 @@ public class SpecificUserResource extends DefaultRestResource {
     /**
      * Returns the User Information and the realms if the user is an admin
      * of if he retrieves his own information.
-     * @param request
-     * @return 
      */
     @Override
     public RestResponse onGET(RestRequest request) {
@@ -119,8 +117,6 @@ public class SpecificUserResource extends DefaultRestResource {
     
     /**
      * The User can change his password, if he knows the old one.
-     * @param request
-     * @return 
      */
     @Override
     public RestResponse onPUT(RestRequest request) {

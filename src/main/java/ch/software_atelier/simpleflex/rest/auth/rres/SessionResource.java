@@ -33,8 +33,6 @@ public class SessionResource extends DefaultRestResource {
 
     /**
      * Updates the SessionToken. No Data required.
-     * @param request
-     * @return 
      */
     @Override
     public RestResponse onPUT(RestRequest request) {
@@ -75,8 +73,6 @@ public class SessionResource extends DefaultRestResource {
     /**
      * The Login function. Creates a new Session.
      * {"user":"username", "pass":"password"}
-     * @param request
-     * @return 
      */
     @Override
     public RestResponse onPOST(RestRequest request) {

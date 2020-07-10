@@ -45,8 +45,6 @@ public class JSONHelper {
 
     /**
      * Merges the first object to the second.
-     * @param first
-     * @param second
      */
     public static void deepMerge(JSONObject first, JSONObject second){
         

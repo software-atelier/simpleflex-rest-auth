@@ -27,8 +27,6 @@ public class GroupACLResource extends DefaultRestResource {
      * Saves the given settings for the given user if he is
      * that user or if he is an admin.
      * {"key":"value",...} Key-Value pairs
-     * @param request
-     * @return 
      */
     @Override
     public RestResponse onPUT(RestRequest request) {
@@ -74,8 +72,6 @@ public class GroupACLResource extends DefaultRestResource {
     /**
      * Returns the settings of a given user if those settings belong to him or
      * if the user is an admin.
-     * @param request
-     * @return 
      */
     @Override
     public RestResponse onGET(RestRequest request) {

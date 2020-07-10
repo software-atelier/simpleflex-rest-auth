@@ -29,8 +29,6 @@ public class GroupResource extends DefaultRestResource {
 
     /**
      * Returns a List of all Users. Admin rights are required
-     * @param request
-     * @return 
      */
     @Override
     public RestResponse onGET(RestRequest request) {
@@ -72,8 +70,6 @@ public class GroupResource extends DefaultRestResource {
     /**
      * Creates a new User. Admin rights are required.
      * {"user":"string", "pass":"string", "admin":"boolean", "realms":{"string":"string"}}
-     * @param request
-     * @return 
      */
     @Override
     public RestResponse onPOST(RestRequest request) {
