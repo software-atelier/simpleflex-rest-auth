@@ -1,10 +1,11 @@
 package ch.software_atelier.simpleflex.rest.auth;
 
+import ch.software_atelier.simpleflex.rest.auth.rres.*;
+import ch.software_atelier.simpleflex.rest.auth.rres.test.AuthenticationPageResource;
+import ch.software_atelier.simpleflex.rest.auth.rres.test.FailedResource;
+import ch.software_atelier.simpleflex.rest.auth.rres.test.SecuredResource;
+import ch.software_atelier.simpleflex.rest.auth.rres.test.SuccessResource;
 import ch.software_atelier.simpleflex.rest.auth.utils.StrHlp;
-import ch.software_atelier.simpleflex.rest.auth.rres.SessionResource;
-import ch.software_atelier.simpleflex.rest.auth.rres.SpecificUserResource;
-import ch.software_atelier.simpleflex.rest.auth.rres.UserResource;
-import ch.software_atelier.simpleflex.rest.auth.rres.UserSettingsResource;
 import ch.software_atelier.simpleflex.rest.auth.data.DataHandler;
 import ch.software_atelier.simpleflex.rest.auth.data.MongoDBDataHandler;
 import ch.software_atelier.simpleflex.rest.auth.token.TokenHandler;
@@ -49,7 +50,14 @@ public class App extends RestApp {
             addResource("/user/{name}", new SpecificUserResource(dh,th,tp));
             // User Settings get & set
             addResource("/user/{name}/settings", new UserSettingsResource(dh,th,tp));
-            
+            // Cookie Authentication
+            addResource("/login", new WebsiteLoginResource(dh,th,"/success","/failed",60*60));
+
+            // Test Implementation
+            addResource("/auth", new AuthenticationPageResource());
+            addResource("/failed", new FailedResource());
+            addResource("/success", new SuccessResource());
+            addResource("/secured", new SecuredResource(tp));
         }catch(Throwable uhe){
             uhe.printStackTrace();
         }

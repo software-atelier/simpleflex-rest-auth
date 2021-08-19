@@ -34,15 +34,29 @@ public class TokenParser {
                 st.nextToken();
                 return st.nextToken();
             }
-            else{
-                return req.getRequestArgument("token");
+            else if(req.getHeaderValue("Cookie") != null){
+               String token = extractToken(req.getHeaderValue("Cookie"));
+               if (token != null){
+                   return token;
+               }
             }
-            
+            return req.getRequestArgument("token");
         }catch(NullPointerException | NoSuchElementException e){
             return null;
         }
     }
-    
+
+    private String extractToken(String cookie){
+        StringTokenizer t = new StringTokenizer(cookie,";");
+        while(t.hasMoreTokens()){
+            String nameValue = t.nextToken().trim();
+            if (nameValue.startsWith("auth=")){
+                return nameValue.substring(5);
+            }
+        }
+        return null;
+    }
+
     public boolean isAdmin(String token)throws TokenHandlerException{
             DefaultClaims claims = getClaims(token);
             return (Boolean)claims.get("admin");
