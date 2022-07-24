@@ -9,7 +9,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.UnsupportedJwtException;
-import io.jsonwebtoken.impl.DefaultClaims;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,17 +57,17 @@ public class TokenParser {
     }
 
     public boolean isAdmin(String token)throws TokenHandlerException{
-            DefaultClaims claims = getClaims(token);
+            Map claims = getClaims(token);
             return (Boolean)claims.get("admin");
     }
     
     public String getUsername(String token) throws TokenHandlerException{
-        DefaultClaims claims = getClaims(token);
+        Map claims = getClaims(token);
         return claims.get("username").toString();
     }
     
     public boolean allowes(String token, JSONObject fields) throws TokenHandlerException{
-        DefaultClaims claims = getClaims(token);
+        Map claims = getClaims(token);
         for (String key: fields.keySet()){
             if (claims.containsKey(key)){
                 if (!fields.get(key).equals(claims.get(key))){
@@ -90,8 +89,8 @@ public class TokenParser {
         try{
             List<String> pathItems = StrHlp.tokenize(path, "/");
             
-            DefaultClaims claims = getClaims(token);
-            Map mapACL = claims.get("acl", Map.class);
+            Map claims = getClaims(token);
+            Map mapACL = (Map)claims.get("acl");
             
             
             JSONObject jACL = JSONHelper.mapToJSON(mapACL);
@@ -124,15 +123,20 @@ public class TokenParser {
     }
     
     public ArrayList<String> getRealms(String token)throws TokenHandlerException{
-        DefaultClaims claims = getClaims(token);
+        Map claims = getClaims(token);
         ArrayList<String> realms = (ArrayList<String>)claims.get("realms");
         return realms;
     }
     
-    public DefaultClaims getClaims(String token) throws TokenHandlerException{
+    public Map getClaims(String token) throws TokenHandlerException{
         try{
-            Jwt jwt = Jwts.parser().setSigningKey(_secret.getBytes("UTF-8")).parse(token);
-            return (DefaultClaims)jwt.getBody();
+            Jwt jwt = Jwts.parserBuilder()
+                    .setSigningKey(_secret.getBytes("UTF-8"))
+                    .build().
+                    parse(token);
+
+            return (Map) jwt.getBody();
+
         }catch(UnsupportedEncodingException uee){
             throw new TokenHandlerException(TokenHandlerException.INTERNAL);
         }catch(ExpiredJwtException ee){

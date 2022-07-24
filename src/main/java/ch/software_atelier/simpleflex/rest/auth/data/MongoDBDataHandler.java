@@ -8,6 +8,7 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
+import jakarta.xml.bind.DatatypeConverter;
 import org.bson.Document;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -16,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import org.json.JSONObject;
-import javax.xml.bind.DatatypeConverter;
 
 public class MongoDBDataHandler implements DataHandler{
     

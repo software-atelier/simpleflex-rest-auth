@@ -7,7 +7,6 @@ import com.google.gson.Gson;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.impl.DefaultClaims;
 
 import java.io.UnsupportedEncodingException;
 import java.time.Instant;
@@ -37,7 +36,7 @@ public class TokenHandler {
     }
 
     public String renew(String token) throws TokenHandlerException {
-        DefaultClaims claims = _parser.getClaims(token);
+        Map claims = _parser.getClaims(token);
         try {
             Object realms = claims.get("realms");
             Object admin = claims.get("admin");
@@ -65,7 +64,7 @@ public class TokenHandler {
 
     public String createToken(String user, int lifetimeInSeconds) throws TokenHandlerException {
         HashMap<String, Object> claims = new HashMap<>();
-
+        System.out.println("Vreating token");
         try {
             HashMap<String, String> realmsMap = _dataHandler.getRealms(user);
             ArrayList<String> realms = new ArrayList<>();
@@ -106,7 +105,6 @@ public class TokenHandler {
                     builder = builder.claim(key, claims.get(key));
                 }
             }
-
             String token = builder.signWith(SignatureAlgorithm.HS256, _secret.getBytes("UTF-8"))
                     .compact();
             return token;
