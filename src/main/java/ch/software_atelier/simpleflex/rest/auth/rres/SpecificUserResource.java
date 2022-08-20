@@ -116,7 +116,8 @@ public class SpecificUserResource extends DefaultRestResource {
     }
     
     /**
-     * The User can change his password, if he knows the old one.
+     * The User can change his password, if he knows the old one. An admin can change the password of any user.
+     * TODO Code Cleanup and Refactoring
      */
     @Override
     public RestResponse onPUT(RestRequest request) {
@@ -128,29 +129,36 @@ public class SpecificUserResource extends DefaultRestResource {
 
             JSONObject obj = request.getJSON();
             
-            boolean changePass = obj.has("old_pass") && obj.has("pass");
+            boolean changePass = (obj.has("old_pass") || _tp.isAdmin(token)) && obj.has("pass");
             boolean changeRealms = obj.has("realms");
             boolean changeAdmin = obj.has("admin");
-            
             // check wether the user can do this or not
-            if (!user.equals(userByToken) && !_tp.isAdmin(token)){
+            if (!isAdminOrSelf(userByToken, user)){
                 return RestResponse.unauthorized_401();
             }
             
-            if (!_tp.isAdmin(token) & (changeRealms || changeAdmin)){
+            if (isNoAdminButWantsToChangePermissions(userByToken,obj)){
                 return RestResponse.unauthorized_401();   
             }
             
             if (changePass){
-                String old_pass = obj.getString("old_pass");
+                String old_pass = null;
+                if (obj.has("old_pass")||!obj.isNull("old_pass")){
+                    old_pass = obj.getString("old_pass"); obj.isNull("old_pass");
+                }
+
                 String pass = obj.getString("pass");
                 boolean isAdmin = _dh.isAdmin(user);
                 try{
-                    _dh.verifyUser(user, old_pass);
+                    if (!_tp.isAdmin(userByToken)) {
+                        if (old_pass == null){
+                            return RestResponse.badRequest_400("old password is invalid");
+                        }
+                        _dh.verifyUser(user, old_pass);
+                    }
                 }catch(DataHandlerException e){
                     return RestResponse.badRequest_400("old password is invalid");
                 }
-
                 _dh.putUser(user, pass, isAdmin);
             }
             
@@ -176,12 +184,32 @@ public class SpecificUserResource extends DefaultRestResource {
             return ExceptionHandler.handle(th, true);
         }
     }
-    
+
+    private boolean isAdminOrSelf(String self, String user){
+        try {
+            return (user.equals(self) || _tp.isAdmin(self));
+        } catch (TokenHandlerException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private boolean isNoAdminButWantsToChangePermissions(String self, JSONObject obj){
+        try {
+            boolean changeRealms = obj.has("realms");
+            boolean changeAdmin = obj.has("admin");
+            return !_tp.isAdmin(self) & (changeRealms || changeAdmin);
+        } catch (TokenHandlerException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     @Override
     public void docPUT(MethodDocumentation request){
         request.setTitle("Change password");
         request.addTag("Authorisazion");
-        request.setDescription("Change the users password");
+        request.setDescription("Change the users password, realms or admin-status. None-Admin user can only change the password if old_pass is known.");
         request.addProduces("application/json");
         request.addParameter(new HeaderParameter("Authorization", "the access token, Baerer"));
         request.addParameter(new PathParameter("name", "the username"));
@@ -192,7 +220,7 @@ public class SpecificUserResource extends DefaultRestResource {
                 .addSimpleProperty("pass", "string", "the new password", false)
                 .addObjectProperty("realms", 
                     ObjectSchemaBuilder.create("The realms. key: realmname, value: realmdescription").toJSON(), false)
-                .addSimpleProperty("admin", "boolean", "change this users admin previgiges", false)
+                .addSimpleProperty("admin", "boolean", "change this users admin privileges", false)
                 .toJSON()
         ));
         
