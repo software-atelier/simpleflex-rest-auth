@@ -123,8 +123,6 @@ public class SpecificUserResource extends DefaultRestResource {
     public RestResponse onPUT(RestRequest request) {
         try{
             String token = _tp.getToken(request);
-            
-            String userByToken = _tp.getUsername(token);
             String user = request.getResourcePlaceholder("name");
 
             JSONObject obj = request.getJSON();
@@ -133,11 +131,11 @@ public class SpecificUserResource extends DefaultRestResource {
             boolean changeRealms = obj.has("realms");
             boolean changeAdmin = obj.has("admin");
             // check wether the user can do this or not
-            if (!isAdminOrSelf(userByToken, user)){
+            if (!isAdminOrSelf(token, user)){
                 return RestResponse.unauthorized_401();
             }
             
-            if (isNoAdminButWantsToChangePermissions(userByToken,obj)){
+            if (isNoAdminButWantsToChangePermissions(token,obj)){
                 return RestResponse.unauthorized_401();   
             }
             
@@ -150,7 +148,7 @@ public class SpecificUserResource extends DefaultRestResource {
                 String pass = obj.getString("pass");
                 boolean isAdmin = _dh.isAdmin(user);
                 try{
-                    if (!_tp.isAdmin(userByToken)) {
+                    if (!_tp.isAdmin(token)) {
                         if (old_pass == null){
                             return RestResponse.badRequest_400("old password is invalid");
                         }
@@ -175,30 +173,29 @@ public class SpecificUserResource extends DefaultRestResource {
                 boolean admin = obj.optBoolean("admin");
                 _dh.putAdmin(user, admin);
             }
-            
-            JSONObject response = new JSONObject();
-            response.put("msg", "ok");
-            return RestResponse.json_200(response);
+
+            return RestResponse.json_200(new JSONObject().put("msg", "ok"));
               
         }catch(DataHandlerException | JSONException | TokenHandlerException th){
             return ExceptionHandler.handle(th, true);
         }
     }
 
-    private boolean isAdminOrSelf(String self, String user){
+    private boolean isAdminOrSelf(String token, String user){
         try {
-            return (user.equals(self) || _tp.isAdmin(self));
+            String authenticatedUser = _tp.getUsername(token);
+            return (user.equals(authenticatedUser) || _tp.isAdmin(authenticatedUser));
         } catch (TokenHandlerException e) {
             e.printStackTrace();
             return false;
         }
     }
 
-    private boolean isNoAdminButWantsToChangePermissions(String self, JSONObject obj){
+    private boolean isNoAdminButWantsToChangePermissions(String token, JSONObject obj){
         try {
             boolean changeRealms = obj.has("realms");
             boolean changeAdmin = obj.has("admin");
-            return !_tp.isAdmin(self) & (changeRealms || changeAdmin);
+            return !_tp.isAdmin(token) & (changeRealms || changeAdmin);
         } catch (TokenHandlerException e) {
             e.printStackTrace();
             return false;
