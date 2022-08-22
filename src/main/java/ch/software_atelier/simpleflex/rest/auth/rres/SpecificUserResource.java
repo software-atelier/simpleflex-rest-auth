@@ -184,7 +184,7 @@ public class SpecificUserResource extends DefaultRestResource {
     private boolean isAdminOrSelf(String token, String user){
         try {
             String authenticatedUser = _tp.getUsername(token);
-            return (user.equals(authenticatedUser) || _tp.isAdmin(authenticatedUser));
+            return (user.equals(authenticatedUser) || _tp.isAdmin(token));
         } catch (TokenHandlerException e) {
             e.printStackTrace();
             return false;
@@ -195,7 +195,7 @@ public class SpecificUserResource extends DefaultRestResource {
         try {
             boolean changeRealms = obj.has("realms");
             boolean changeAdmin = obj.has("admin");
-            return !_tp.isAdmin(token) & (changeRealms || changeAdmin);
+            return !_tp.isAdmin(token) && (changeRealms || changeAdmin);
         } catch (TokenHandlerException e) {
             e.printStackTrace();
             return false;
