@@ -52,6 +52,8 @@ public interface DataHandler {
             throws DataHandlerException;
             
     List<String> getUsers();
+
+    List<String> getUsersBySetting(String key, String value);
     
     void deleteUser(String username)
             throws DataHandlerException;

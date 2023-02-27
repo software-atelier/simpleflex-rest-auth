@@ -32,24 +32,30 @@ public class UserResource extends DefaultRestResource {
         _dh = dh;
         _th = th;
     }
-    
 
-    
     /**
      * Returns a List of all Users. Admin rights are required
      */
     @Override
     public RestResponse onGET(RestRequest request) {
         try{
-            
             String token = _tp.getToken(request);
             if (token == null){
                 return RestResponse.unauthorized_401();
             }
             if (_tp.isAdmin(token)){
-                List<String> users = _dh.getUsers();
-                JSONArray arr = JSONHelper.stringList2JSONArr(users);
-                return RestResponse.json_200(arr);
+                String key = request.getRequestArgument("key");
+                String value = request.getRequestArgument("value");
+                if (key!=null && value!=null){
+                    List<String> users = _dh.getUsersBySetting(key, value);
+                    JSONArray arr = JSONHelper.stringList2JSONArr(users);
+                    return RestResponse.json_200(arr);
+                }
+                else{
+                    List<String> users = _dh.getUsers();
+                    JSONArray arr = JSONHelper.stringList2JSONArr(users);
+                    return RestResponse.json_200(arr);
+                }
             }
             return RestResponse.unauthorized_401();
         }catch(TokenHandlerException the){
