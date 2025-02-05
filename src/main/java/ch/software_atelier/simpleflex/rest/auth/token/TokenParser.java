@@ -3,19 +3,20 @@ package ch.software_atelier.simpleflex.rest.auth.token;
 import ch.software_atelier.simpleflex.rest.auth.utils.StrHlp;
 import ch.software_atelier.simpleflex.rest.auth.utils.JSONHelper;
 import ch.software_atelier.simpleflex.rest.RestRequest;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwt;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.SignatureException;
-import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.*;
+
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
+
+import io.jsonwebtoken.security.Keys;
 import org.json.JSONObject;
+
+import javax.crypto.SecretKey;
 
 public class TokenParser {
     private final String _secret;
@@ -130,15 +131,18 @@ public class TokenParser {
     
     public Map getClaims(String token) throws TokenHandlerException{
         try{
-            Jwt jwt = Jwts.parserBuilder()
-                    .setSigningKey(_secret.getBytes("UTF-8"))
-                    .build().
-                    parse(token);
 
-            return (Map) jwt.getBody();
+            // ✅ Correct way to create a SecretKey in JJWT 0.12
+            SecretKey secretKey = Keys.hmacShaKeyFor(_secret.getBytes(StandardCharsets.UTF_8));
 
-        }catch(UnsupportedEncodingException uee){
-            throw new TokenHandlerException(TokenHandlerException.INTERNAL);
+            // ✅ Use `Jwts.parser()`
+            Jws<Claims> jwt = Jwts.parser()   // Correct method in JJWT 0.12
+                    .verifyWith(secretKey)    // Use `verifyWith()` instead of `setSigningKey()`
+                    .build()                  // Required before parsing
+                    .parseSignedClaims(token); // Use `parseSignedClaims()` instead of `parseClaimsJws()`
+
+            return jwt.getPayload();
+
         }catch(ExpiredJwtException ee){
             throw new TokenHandlerException(TokenHandlerException.EXPIRED);
         }catch(SignatureException se){

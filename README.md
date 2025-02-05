@@ -6,6 +6,6 @@ An Authentication Framework for Simpleflex
         <dependency>
             <groupId>ch.software-atelier</groupId>
             <artifactId>simpleflex-auth</artifactId>
-            <version>2.4.0</version>
+            <version>2.4.3</version>
         </dependency>
 ```
