@@ -24,7 +24,7 @@ identity service is `DataHandler`; a protected endpoint explicitly uses a
 <dependency>
     <groupId>ch.software-atelier</groupId>
     <artifactId>simpleflex-auth</artifactId>
-    <version>2.4.3</version>
+    <version>2.4.4</version>
 </dependency>
 ```
 
