@@ -20,7 +20,7 @@ identity service is `DataHandler`; a protected endpoint explicitly uses a
 
 ## Dependency
 
-The latest published Maven Central version is `simpleflex-auth:2.4.4`. This branch prepares `2.4.5`, which requires Java 17 and Maven 3.9 or newer to build. Use `2.4.4` until `2.4.5` is verified on Maven Central. The following snippet is for the forthcoming release:
+The latest Maven Central release is [2.4.5](https://central.sonatype.com/artifact/ch.software-atelier/simpleflex-auth/2.4.5). It requires Java 17; building this repository requires Maven 3.9 or newer. Add it to your project with:
 
 ```xml
 <dependency>
