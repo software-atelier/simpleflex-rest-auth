@@ -20,11 +20,13 @@ identity service is `DataHandler`; a protected endpoint explicitly uses a
 
 ## Dependency
 
+The latest published Maven Central version is `simpleflex-auth:2.4.4`. This branch prepares `2.4.5`, which requires Java 17 and Maven 3.9 or newer to build. Use `2.4.4` until `2.4.5` is verified on Maven Central. The following snippet is for the forthcoming release:
+
 ```xml
 <dependency>
     <groupId>ch.software-atelier</groupId>
     <artifactId>simpleflex-auth</artifactId>
-    <version>2.4.4</version>
+    <version>2.4.5</version>
 </dependency>
 ```
 
@@ -438,3 +440,7 @@ inputs, and the status codes of protected resources.
 ## License
 
 Apache License 2.0. See [LICENSE](LICENSE).
+
+## Publishing
+
+See [Release procedure](docs/RELEASING.md) for the Maven Central publishing flow.
